@@ -1,0 +1,11 @@
+[Unit]
+Description=Flask Service
+After=syslog.target
+[Service]
+User=root
+WorkingDirectory=/root/python-iptables
+ExecStart=/usr/bin/python /root/python-iptables/main.py
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
