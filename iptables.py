@@ -37,12 +37,6 @@ def add_iptables_rule(table, chain, protocol=None, src_ip=None, dst_ip=None, out
     chain = iptc.Chain(iptc.Table(table), chain)
     chain.insert_rule(rule)
 
-# 添加端口转发规则
-#add_iptables_rule("nat", "PREROUTING", protocol="tcp", dst_port="3222", action="DNAT", to_destination="192.168.122.2:22")
-
-# 添加防火墙规则
-#add_iptables_rule("filter", "FORWARD", protocol="tcp", src_ip="218.76.50.10", dst_ip="192.168.122.2", out_interface="virbr0", dst_port="22", action="ACCEPT")
-
 def get_iptables_rule(table, chain, version):
     """
     获取iptables规则
