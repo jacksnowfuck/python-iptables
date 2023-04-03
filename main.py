@@ -2,7 +2,6 @@
 import iptc
 from flask import Flask, request, jsonify, render_template
 from iptables import get_iptables_rule,add_iptables_rule,delete_iptables_rule
-import time
 app = Flask(__name__)
 
 # flask配置
@@ -12,29 +11,40 @@ app.config['JSONIFY_PRETTYPRINT_REGULAR'] = False
 app.config['JSON_SORT_KEYS'] = False
 app.config['JSONIFY_MIMETYPE'] = 'application/json'
 
-# 获取iptables规则
+# 获取FORWARD规则
 @app.route('/iptables/get_forward_rules', methods=['GET'])
 def get_forward_rules():
     # 获取filter表FORWARD链中的所有规则
-    forward_rules = get_iptables_rule("filter", "FORWARD", time.time())
+    forward_rules = get_iptables_rule("filter", "FORWARD")
     json_forward_rules = jsonify({'forward_rules': forward_rules})
     return json_forward_rules
 
-# 获取iptables规则
+# 获取NAT规则
 @app.route('/iptables/get_nat_rules', methods=['GET'])
 def get_nat_rules():
     # 获取nat表PREROUTING链中的所有规则
-    nat_rules = get_iptables_rule("nat", "PREROUTING", time.time())
+    nat_rules = get_iptables_rule("nat", "PREROUTING")
     json_nat_rules = jsonify({'nat_rules': nat_rules})
     return json_nat_rules
+
+# 获取INPUT规则
+@app.route('/iptables/get_input_rules', methods=['GET'])
+def get_input_rules():
+    # 获取nat表PREROUTING链中的所有规则
+    input_rules = get_iptables_rule("filter", "IN_public_allow")
+    json_input_rules = jsonify({'input_rules': input_rules})
+    return json_input_rules
 
 # 删除iptables规则
 @app.route('/iptables/delete_rule', methods=['POST'])
 def delete_rule():
     data = request.get_json()
-    table = data.get('table', 'filter')
-    chain = data.get('chain', 'FORWARD')
-    rule_spec = data.get('rule', '')
+#    key = data.get('key') # 获取请求中的key参数
+#    if key != 'mUha38KvGGCkDCRAyFMR':
+#        return jsonify({'message': '无效的校验参数！'}), 406
+    table = data.get('table')
+    chain = data.get('chain')
+    rule_spec = data.get('rule')
     if not rule_spec:
         return jsonify({'message': '规则不能为空！'}), 400
     delete_iptables_rule(table, chain, rule_spec)
